@@ -35,6 +35,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
@@ -52,16 +53,17 @@ public class SerachDetailActivity extends Activity {
 	private ImageButton jiafen, koufen;
 	private TextView title, category, readnumber, tuijian, butuijian, body;
 	private LinearLayout ly_fanhui;
-	private static final String SERVICE_URL = "http://192.168.191.1:8080/RestWebServiceDemo/rest/news";
+	private static final String SERVICE_URL = "http://192.168.191.1:8080/RestWebServiceDemo/rest/newsnumber";
 	String picturepath = null;
 	private static final String TAG = "SerachDetailActivity";
+	ImageView imageViewOne;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_news_detail);
-
+		imageViewOne = (ImageView) findViewById(R.id.news_detail_iv);
 		title = (TextView) findViewById(R.id.title);
 		category = (TextView) findViewById(R.id.category);
 		readnumber = (TextView) findViewById(R.id.readnumber);
@@ -76,17 +78,28 @@ public class SerachDetailActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				String biaoti = title.getText().toString();
+				String yueduliang = readnumber.getText().toString();
+				String like = tuijian.getText().toString();
+				String unlike = butuijian.getText().toString();
+
+				WebServiceTask wst = new WebServiceTask(
+						WebServiceTask.POST_TASK, SerachDetailActivity.this,
+						"提交中，请稍候...");
+
+				wst.addNameValuePair("title", biaoti);
+				wst.addNameValuePair("read", yueduliang);
+				wst.addNameValuePair("like", like);
+				wst.addNameValuePair("unlike", unlike);
+
+				// the passed String is the URL we will POST to
+				wst.execute(new String[] { SERVICE_URL });
 				finish();
 			}
 		});
 
 		Intent intent = getIntent();
-		if (intent != null) {
-			String sampleURL = SERVICE_URL + "/1";
-			WebServiceTask wst = new WebServiceTask(WebServiceTask.GET_TASK,
-					SerachDetailActivity.this, "正在加载，请稍候...");
-			wst.execute(new String[] { sampleURL });
-		}
+
 		intent.getExtras();
 		Bundle data = intent.getExtras();
 		int position = data.getInt("news_id");
@@ -96,7 +109,46 @@ public class SerachDetailActivity extends Activity {
 		readnumber.setText(String.valueOf(Integer.parseInt(news
 				.getYueDuLiang2()) + 1));
 		body.setText(news.getBody());
+		tuijian.setText(news.getLike());
+		butuijian.setText(news.getUnlike());
+		picturepath = news.getTupiandizhi();
+		if (picturepath == null) {
 
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					final Bitmap bitmap = getHttpBitmap("http://img.tvb.com/i news_web/web/generic_thumbnail.jpg");
+					imageViewOne.post(new Runnable() {
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							imageViewOne.setImageBitmap(bitmap);
+						}
+					});
+				}
+			}).start();
+		} else {
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					final Bitmap bi = getBitmap(picturepath);// 这里调用的是后台传来的图片的base64字符串编码
+					imageViewOne.post(new Runnable() {
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							imageViewOne.setImageBitmap(bi);
+						}
+					});
+				}
+			}).start();
+
+		}
 		jiafen.setOnClickListener(new Button.OnClickListener() {
 
 			@Override
@@ -126,60 +178,184 @@ public class SerachDetailActivity extends Activity {
 		});
 	}
 
-	public void handleResponse(String response) {
-		final ImageView imageViewOne = (ImageView) findViewById(R.id.news_detail_iv);
-		try {
+	public void postData(View vw) {
 
-			JSONObject jso = new JSONObject(response);
+		String biaoti = title.getText().toString();
+		String yueduliang = readnumber.getText().toString();
+		String like = tuijian.getText().toString();
+		String unlike = butuijian.getText().toString();
 
-			String biaoti = jso.getString("title");
-			String neirong = jso.optString("body");
+		WebServiceTask wst = new WebServiceTask(WebServiceTask.POST_TASK, this,
+				"提交中，请稍候...");
 
-			title.setText(biaoti);
-			body.setText(neirong);
-			/*
-			 * 形式一：获取后台传来的图片
-			 */
-			final String tupian = jso.optString("picturepath");
-			if (tupian == null) {
+		wst.addNameValuePair("title", biaoti);
+		wst.addNameValuePair("read", yueduliang);
+		wst.addNameValuePair("like", like);
+		wst.addNameValuePair("unlike", unlike);
 
-				new Thread(new Runnable() {
+		// the passed String is the URL we will POST to
+		wst.execute(new String[] { SERVICE_URL });
 
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						final Bitmap bitmap = getHttpBitmap("http://img.tvb.com/inews_web/web/generic_thumbnail.jpg");
-						imageViewOne.post(new Runnable() {
+	}
 
-							@Override
-							public void run() {
-								// TODO Auto-generated method stub
-								imageViewOne.setImageBitmap(bitmap);
-							}
-						});
-					}
-				}).start();
+	// 主要操作部分
+	private class WebServiceTask extends AsyncTask<String, Integer, String> {
+
+		public static final int POST_TASK = 1;
+		public static final int GET_TASK = 2;
+
+		private static final String TAG = "WebServiceTask";
+
+		// connection timeout, in milliseconds (waiting to connect)
+		private static final int CONN_TIMEOUT = 3000;
+
+		// socket timeout, in milliseconds (waiting for data)
+		private static final int SOCKET_TIMEOUT = 5000;
+
+		private int taskType = GET_TASK;
+		private Context mContext = null;
+		private String processMessage = "Processing...";
+
+		private ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+
+		private ProgressDialog pDlg = null;
+
+		public WebServiceTask(int taskType, Context mContext,
+				String processMessage) {
+
+			this.taskType = taskType;
+			this.mContext = mContext;
+			this.processMessage = processMessage;
+		}
+
+		public void addNameValuePair(String name, String value) {
+
+			params.add(new BasicNameValuePair(name, value));
+		}
+
+		private void showProgressDialog() {
+
+			pDlg = new ProgressDialog(mContext);
+			pDlg.setMessage(processMessage);
+			pDlg.setProgressDrawable(mContext.getWallpaper());
+			pDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			pDlg.setCancelable(false);
+			pDlg.show();
+
+		}
+
+		@Override
+		protected void onPreExecute() {
+
+			showProgressDialog();
+
+		}
+
+		protected String doInBackground(String... urls) {
+
+			String url = urls[0];
+			String result = "";
+
+			HttpResponse response = doResponse(url);
+
+			if (response == null) {
+				return result;
 			} else {
-				new Thread(new Runnable() {
 
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						final Bitmap bi = getBitmap(tupian);// 这里调用的是后台传来的图片的base64字符串编码
-						imageViewOne.post(new Runnable() {
+				try {
 
-							@Override
-							public void run() {
-								// TODO Auto-generated method stub
-								imageViewOne.setImageBitmap(bi);
-							}
-						});
-					}
-				}).start();
+					result = inputStreamToString(response.getEntity()
+							.getContent());
+
+				} catch (IllegalStateException e) {
+					Log.e(TAG, e.getLocalizedMessage(), e);
+
+				} catch (IOException e) {
+					Log.e(TAG, e.getLocalizedMessage(), e);
+				}
 
 			}
-		} catch (Exception e) {
-			Log.e(TAG, e.getLocalizedMessage(), e);
+
+			return result;
+		}
+
+		@Override
+		protected void onPostExecute(String response) {
+
+			if (response != null) {
+				Toast.makeText(getApplicationContext(), "上传成功！", 0).show();
+
+			} else {
+				Toast.makeText(getApplicationContext(), "上传失败！", 0).show();
+			}
+			pDlg.dismiss();
+
+		}
+
+		// Establish connection and socket (data retrieval) timeouts
+		private HttpParams getHttpParams() {
+
+			HttpParams htpp = new BasicHttpParams();
+
+			HttpConnectionParams.setConnectionTimeout(htpp, CONN_TIMEOUT);
+			HttpConnectionParams.setSoTimeout(htpp, SOCKET_TIMEOUT);
+
+			return htpp;
+		}
+
+		private HttpResponse doResponse(String url) {
+
+			// Use our connection and data timeouts as parameters for our
+			// DefaultHttpClient
+			HttpClient httpclient = new DefaultHttpClient(getHttpParams());
+
+			HttpResponse response = null;
+
+			try {
+				switch (taskType) {
+
+				case POST_TASK:
+					HttpPost httppost = new HttpPost(url);
+					// Add parameters 解决服务器端中文乱码的问题
+					httppost.setEntity(new UrlEncodedFormEntity(params,
+							HTTP.UTF_8));
+					// httppost.setEntity(new
+					// StringEntity(params.toString(),HTTP.UTF_8));
+					response = httpclient.execute(httppost);
+					break;
+				case GET_TASK:
+					HttpGet httpget = new HttpGet(url);
+					response = httpclient.execute(httpget);
+					break;
+				}
+			} catch (Exception e) {
+
+				Log.e(TAG, e.getLocalizedMessage(), e);
+
+			}
+
+			return response;
+		}
+
+		private String inputStreamToString(InputStream is) {
+
+			String line = "";
+			StringBuilder total = new StringBuilder();
+
+			// Wrap a BufferedReader around the InputStream
+			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+
+			try {
+				// Read response until the end
+				while ((line = rd.readLine()) != null) {
+					total.append(line);
+				}
+			} catch (IOException e) {
+				Log.e(TAG, e.getLocalizedMessage(), e);
+			}
+
+			// Return full string
+			return total.toString();
 		}
 
 	}
@@ -246,171 +422,31 @@ public class SerachDetailActivity extends Activity {
 		// .decodeByteArray(bitmapArray, 0, bitmapArray.length);
 	}
 
-	// 主要操作部分
-	private class WebServiceTask extends AsyncTask<String, Integer, String> {
-
-		public static final int POST_TASK = 1;
-		public static final int GET_TASK = 2;
-
-		private static final String TAG = "WebServiceTask";
-
-		// connection timeout, in milliseconds (waiting to connect)
-		private static final int CONN_TIMEOUT = 3000;
-
-		// socket timeout, in milliseconds (waiting for data)
-		private static final int SOCKET_TIMEOUT = 5000;
-
-		private int taskType = GET_TASK;
-		private Context mContext = null;
-		private String processMessage = "Processing...";
-
-		private ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-
-		private ProgressDialog pDlg = null;
-
-		public WebServiceTask(int taskType, Context mContext,
-				String processMessage) {
-
-			this.taskType = taskType;
-			this.mContext = mContext;
-			this.processMessage = processMessage;
-		}
-
-		public void addNameValuePair(String name, String value) {
-
-			params.add(new BasicNameValuePair(name, value));
-		}
-
-		@SuppressWarnings("deprecation")
-		private void showProgressDialog() {
-
-			pDlg = new ProgressDialog(mContext);
-			pDlg.setMessage(processMessage);
-			pDlg.setProgressDrawable(mContext.getWallpaper());
-			pDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			pDlg.setCancelable(false);
-			pDlg.show();
-
-		}
-
-		@Override
-		protected void onPreExecute() {
-
-			showProgressDialog();
-
-		}
-
-		protected String doInBackground(String... urls) {
-
-			String url = urls[0];
-			String result = "";
-
-			HttpResponse response = doResponse(url);
-
-			if (response == null) {
-				return result;
-			} else {
-
-				try {
-
-					result = inputStreamToString(response.getEntity()
-							.getContent());
-
-				} catch (IllegalStateException e) {
-					Log.e(TAG, e.getLocalizedMessage(), e);
-
-				} catch (IOException e) {
-					Log.e(TAG, e.getLocalizedMessage(), e);
-				}
-
-			}
-
-			return result;
-		}
-
-		@Override
-		protected void onPostExecute(String response) {
-
-			handleResponse(response);
-			if (response != null) {
-				Toast.makeText(getApplicationContext(), "查询成功！", 0).show();
-
-			} else {
-				Toast.makeText(getApplicationContext(), "查询失败！", 0).show();
-			}
-			pDlg.dismiss();
-			// System.out.println("输出"+response);
-
-		}
-
-		// Establish connection and socket (data retrieval) timeouts
-		private HttpParams getHttpParams() {
-
-			HttpParams htpp = new BasicHttpParams();
-
-			HttpConnectionParams.setConnectionTimeout(htpp, CONN_TIMEOUT);
-			HttpConnectionParams.setSoTimeout(htpp, SOCKET_TIMEOUT);
-
-			return htpp;
-		}
-
-		private HttpResponse doResponse(String url) {
-
-			// Use our connection and data timeouts as parameters for our
-			// DefaultHttpClient
-			HttpClient httpclient = new DefaultHttpClient(getHttpParams());
-
-			HttpResponse response = null;
-
-			try {
-				switch (taskType) {
-
-				case POST_TASK:
-					HttpPost httppost = new HttpPost(url);
-					// Add parameters
-					httppost.setEntity(new UrlEncodedFormEntity(params,
-							HTTP.UTF_8));
-					response = httpclient.execute(httppost);
-					break;
-				case GET_TASK:
-					HttpGet httpget = new HttpGet(url);
-					response = httpclient.execute(httpget);
-					break;
-				}
-			} catch (Exception e) {
-
-				Log.e(TAG, e.getLocalizedMessage(), e);
-
-			}
-
-			return response;
-		}
-
-		private String inputStreamToString(InputStream is) {
-
-			String line = "";
-			StringBuilder total = new StringBuilder();
-
-			// Wrap a BufferedReader around the InputStream
-			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-
-			try {
-				// Read response until the end
-				while ((line = rd.readLine()) != null) {
-					total.append(line);
-				}
-			} catch (IOException e) {
-				Log.e(TAG, e.getLocalizedMessage(), e);
-			}
-
-			// Return full string
-			return total.toString();
-		}
-
-	}
-
 	private void DisplayToast(String string) {
 		// TODO Auto-generated method stub
 		Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if ((keyCode == KeyEvent.KEYCODE_BACK) && (event.getRepeatCount() == 0)) {
+			String biaoti = title.getText().toString();
+			String yueduliang = readnumber.getText().toString();
+			String like = tuijian.getText().toString();
+			String unlike = butuijian.getText().toString();
+
+			WebServiceTask wst = new WebServiceTask(WebServiceTask.POST_TASK,
+					this, "提交中，请稍候...");
+
+			wst.addNameValuePair("title", biaoti);
+			wst.addNameValuePair("read", yueduliang);
+			wst.addNameValuePair("like", like);
+			wst.addNameValuePair("unlike", unlike);
+
+			// the passed String is the URL we will POST to
+			wst.execute(new String[] { SERVICE_URL });
+			finish();
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

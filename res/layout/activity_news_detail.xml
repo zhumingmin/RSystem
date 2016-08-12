@@ -54,7 +54,8 @@
             android:layout_height="35dp"
             android:layout_gravity="center"
             android:layout_margin="5dip"
-            android:background="@drawable/share" >
+            android:background="@drawable/share"
+            android:onClick="postData" >
         </ImageButton>
     </LinearLayout>
 
@@ -137,7 +138,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="6.0dip"
-                        android:text="50"
+                        android:text="0"
                         android:textColor="@color/gray"
                         android:textSize="@dimen/text_size_12" />
 
@@ -155,7 +156,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="6.0dip"
-                        android:text="10"
+                        android:text="0"
                         android:textColor="@color/gray"
                         android:textSize="@dimen/text_size_12" />
                 </LinearLayout>
@@ -164,8 +165,8 @@
 
                 <ImageView
                     android:id="@+id/news_detail_iv"
-                    android:layout_width="320dp"
-                    android:layout_height="180dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_margin="5dp" />
 

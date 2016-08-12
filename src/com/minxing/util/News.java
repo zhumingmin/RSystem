@@ -3,16 +3,21 @@ package com.minxing.util;
 public class News {
 	private String biaoti;
 	private String leibie;
-
+	private String tupiandizhi;
 	private String yueduliang2;
 	private String body;
+	private String like;
+	private String unlike;
 
-	public News(String biaoti, String leibie, String yueduliang2, String body) {
+	public News(String biaoti, String leibie, String yueduliang2, String like,
+			String unlike, String body, String tupiandizhi) {
 		this.biaoti = biaoti;
 		this.leibie = leibie;
-
 		this.yueduliang2 = yueduliang2;
+		this.like = like;
+		this.unlike = unlike;
 		this.body = body;
+		this.tupiandizhi = tupiandizhi;
 	}
 
 	public String getBiaoTi() {
@@ -27,8 +32,20 @@ public class News {
 		return yueduliang2;
 	}
 
+	public String getLike() {
+		return like;
+	}
+
+	public String getUnlike() {
+		return unlike;
+	}
+
 	public String getBody() {
 		return body;
+	}
+
+	public String getTupiandizhi() {
+		return tupiandizhi;
 	}
 
 }
