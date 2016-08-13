@@ -1153,13 +1153,14 @@ containing a value of this type.
         public static final int mm_title_functionframe_line=0x7f020066;
         public static final int mm_title_functionframe_pressed=0x7f020067;
         public static final int share=0x7f020068;
-        public static final int sousuokuang=0x7f020069;
-        public static final int title_function_bg=0x7f02006a;
-        public static final int title_list_selector=0x7f02006b;
-        public static final int unlike=0x7f02006c;
-        public static final int unlike_pressed=0x7f02006d;
-        public static final int widget_comment_count_icon=0x7f02006e;
-        public static final int yuyin=0x7f02006f;
+        public static final int shuaxin=0x7f020069;
+        public static final int sousuokuang=0x7f02006a;
+        public static final int title_function_bg=0x7f02006b;
+        public static final int title_list_selector=0x7f02006c;
+        public static final int unlike=0x7f02006d;
+        public static final int unlike_pressed=0x7f02006e;
+        public static final int widget_comment_count_icon=0x7f02006f;
+        public static final int yuyin=0x7f020070;
     }
     public static final class id {
         public static final int FanHui=0x7f050043;
@@ -1210,6 +1211,7 @@ containing a value of this type.
         public static final int listMode=0x7f050001;
         public static final int listView1=0x7f050048;
         public static final int list_item=0x7f050029;
+        public static final int load=0x7f05003f;
         public static final int ly_fanhui_sousuo=0x7f050042;
         public static final int ly_liebiao=0x7f05003c;
         public static final int ly_xiangqing=0x7f05004f;
@@ -1249,7 +1251,6 @@ containing a value of this type.
         public static final int submit_area=0x7f050039;
         public static final int tabMode=0x7f050002;
         public static final int title=0x7f05002b;
-        public static final int title_edit=0x7f05003f;
         public static final int title_list=0x7f050064;
         public static final int top_action_bar=0x7f050020;
         public static final int tuijian=0x7f050055;

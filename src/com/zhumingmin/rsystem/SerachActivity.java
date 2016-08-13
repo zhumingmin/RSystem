@@ -117,15 +117,28 @@ public class SerachActivity extends Activity {
 				finish();
 			}
 		});
+		// 从后台获取搜索热词
+		soufanshiliu.setText("习近平");
+		soufenjiao.setText("孙杨");
+		soumugua.setText("奥运");
+		souqita.setText("习近平主席");
 		soufanshiliu.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				String data = soufanshiliu.getText().toString();
+				String keyword = soufanshiliu.getText().toString();
+
+				WebServiceTask wst = new WebServiceTask(
+						WebServiceTask.POST_TASK, SerachActivity.this,
+						"正在跳转，请稍后……");
+
+				wst.addNameValuePair("keyword", keyword);
+
+				// the passed String is the URL we will POST to
+				wst.execute(new String[] { SERVICE_URL });
 				Intent intent = new Intent(SerachActivity.this,
-						ReCiSerachActivity.class);
-				intent.putExtra("reci", data);
+						SerachListActivity.class);
 				startActivity(intent);
 
 			}
@@ -136,10 +149,18 @@ public class SerachActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				String data = soufenjiao.getText().toString();
+				String keyword = soufenjiao.getText().toString();
+
+				WebServiceTask wst = new WebServiceTask(
+						WebServiceTask.POST_TASK, SerachActivity.this,
+						"正在跳转，请稍后……");
+
+				wst.addNameValuePair("keyword", keyword);
+
+				// the passed String is the URL we will POST to
+				wst.execute(new String[] { SERVICE_URL });
 				Intent intent = new Intent(SerachActivity.this,
-						ReCiSerachActivity.class);
-				intent.putExtra("reci", data);
+						SerachListActivity.class);
 				startActivity(intent);
 
 			}
@@ -150,10 +171,18 @@ public class SerachActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				String data = soumugua.getText().toString();
+				String keyword = soumugua.getText().toString();
+
+				WebServiceTask wst = new WebServiceTask(
+						WebServiceTask.POST_TASK, SerachActivity.this,
+						"正在跳转，请稍后……");
+
+				wst.addNameValuePair("keyword", keyword);
+
+				// the passed String is the URL we will POST to
+				wst.execute(new String[] { SERVICE_URL });
 				Intent intent = new Intent(SerachActivity.this,
-						ReCiSerachActivity.class);
-				intent.putExtra("reci", data);
+						SerachListActivity.class);
 				startActivity(intent);
 
 			}
@@ -164,10 +193,18 @@ public class SerachActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				String data = souqita.getText().toString();
+				String keyword = souqita.getText().toString();
+
+				WebServiceTask wst = new WebServiceTask(
+						WebServiceTask.POST_TASK, SerachActivity.this,
+						"正在跳转，请稍后……");
+
+				wst.addNameValuePair("keyword", keyword);
+
+				// the passed String is the URL we will POST to
+				wst.execute(new String[] { SERVICE_URL });
 				Intent intent = new Intent(SerachActivity.this,
-						ReCiSerachActivity.class);
-				intent.putExtra("reci", data);
+						SerachListActivity.class);
 				startActivity(intent);
 
 			}

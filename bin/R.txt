@@ -389,13 +389,14 @@ int drawable mm_title_btn_receiver_normal 0x7f020065
 int drawable mm_title_functionframe_line 0x7f020066
 int drawable mm_title_functionframe_pressed 0x7f020067
 int drawable share 0x7f020068
-int drawable sousuokuang 0x7f020069
-int drawable title_function_bg 0x7f02006a
-int drawable title_list_selector 0x7f02006b
-int drawable unlike 0x7f02006c
-int drawable unlike_pressed 0x7f02006d
-int drawable widget_comment_count_icon 0x7f02006e
-int drawable yuyin 0x7f02006f
+int drawable shuaxin 0x7f020069
+int drawable sousuokuang 0x7f02006a
+int drawable title_function_bg 0x7f02006b
+int drawable title_list_selector 0x7f02006c
+int drawable unlike 0x7f02006d
+int drawable unlike_pressed 0x7f02006e
+int drawable widget_comment_count_icon 0x7f02006f
+int drawable yuyin 0x7f020070
 int id FanHui 0x7f050043
 int id action_bar 0x7f05001c
 int id action_bar_activity_content 0x7f050015
@@ -444,6 +445,7 @@ int id list 0x7f050040
 int id listMode 0x7f050001
 int id listView1 0x7f050048
 int id list_item 0x7f050029
+int id load 0x7f05003f
 int id ly_fanhui_sousuo 0x7f050042
 int id ly_liebiao 0x7f05003c
 int id ly_xiangqing 0x7f05004f
@@ -483,7 +485,6 @@ int id split_action_bar 0x7f05001e
 int id submit_area 0x7f050039
 int id tabMode 0x7f050002
 int id title 0x7f05002b
-int id title_edit 0x7f05003f
 int id title_list 0x7f050064
 int id top_action_bar 0x7f050020
 int id tuijian 0x7f050055

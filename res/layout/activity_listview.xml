@@ -50,15 +50,14 @@
             android:textSize="25sp" >
         </TextView>
 
-        <Button
-            android:id="@+id/title_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:id="@+id/load"
+            android:layout_width="25dip"
+            android:layout_height="25dip"
             android:layout_gravity="center"
-            android:layout_margin="5dip"
-            android:background="@drawable/btn_bg"
-            android:textColor="#fff" >
-        </Button>
+            android:layout_margin="15dip"
+            android:background="@drawable/shuaxin" >
+        </ImageButton>
     </LinearLayout>
 
     <LinearLayout

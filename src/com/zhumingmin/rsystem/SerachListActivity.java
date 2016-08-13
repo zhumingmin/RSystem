@@ -42,6 +42,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -57,7 +58,7 @@ public class SerachListActivity extends Activity {
 	public static List<News> newslist = new ArrayList<News>();
 	private LinearLayout ly_fanhui;
 	private static final String SERVICE_URL = "http://192.168.191.1:8080/RestWebServiceDemo/rest/news";
-
+	private ImageButton load;
 	private static final String TAG = "SerachListActivity";
 
 	@Override
@@ -70,13 +71,29 @@ public class SerachListActivity extends Activity {
 				SerachListActivity.this, "正在加载，请稍候...");
 		wst.execute(new String[] { sampleURL });
 		initNews();
+
 		ly_fanhui = (LinearLayout) findViewById(R.id.ly_liebiao);
+		load = (ImageButton) findViewById(R.id.load);
+		load.setOnClickListener(new Button.OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				finish();
+				Intent intent = new Intent(SerachListActivity.this,
+						SerachListActivity.class);
+				startActivity(intent);
+			}
+
+		});
 		ly_fanhui.setOnClickListener(new Button.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				finish();
+				Intent intent = new Intent(SerachListActivity.this,
+						SerachActivity.class);
+				startActivity(intent);
 			}
 		});
 		NewsAdapter adapter = new NewsAdapter(SerachListActivity.this,
@@ -94,6 +111,10 @@ public class SerachListActivity extends Activity {
 			}
 		});
 
+	}
+
+	public void refresh() {
+		onResume();
 	}
 
 	public static String[] convertStrToArray(String str) {
