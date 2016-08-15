@@ -53,6 +53,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.minxing.util.ActionItem;
+import com.minxing.util.News;
 import com.minxing.util.RecordSQLiteOpenHelper;
 import com.minxing.view.MyListView;
 import com.minxing.view.TitlePopup;
@@ -67,6 +68,7 @@ import com.minxing.view.TitlePopup;
  */
 public class SerachActivity extends Activity {
 	private static final String SERVICE_URL = "http://192.168.191.1:8080/RestWebServiceDemo/rest/keyword";
+	private static final String SERVICE_URL2 = "http://192.168.191.1:8080/RestWebServiceDemo/rest/hotwords";
 	private static final String TAG = "SerachActivity";
 	protected static final int RESULT_SPEECH = 1;
 	private LinearLayout ly_fanhui;
@@ -117,11 +119,12 @@ public class SerachActivity extends Activity {
 				finish();
 			}
 		});
+		String sampleURL = SERVICE_URL2 + "/1";
+		WebServiceTask wst = new WebServiceTask(WebServiceTask.GET_TASK,
+				SerachActivity.this, "正在加载，请稍候...");
+		wst.execute(new String[] { sampleURL });
 		// 从后台获取搜索热词
-		soufanshiliu.setText("习近平");
-		soufenjiao.setText("孙杨");
-		soumugua.setText("奥运");
-		souqita.setText("习近平主席");
+
 		soufanshiliu.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -348,17 +351,81 @@ public class SerachActivity extends Activity {
 
 	public void handleResponse(String response) {
 
-		EditText tianxiekeyword = (EditText) findViewById(R.id.newsousuo1);
-
-		tianxiekeyword.setText("");
+		// EditText tianxiekeyword = (EditText) findViewById(R.id.newsousuo1);
+		soufanshiliu = (Button) findViewById(R.id.soufanshiliu1);
+		soufenjiao = (Button) findViewById(R.id.soufenjiao1);
+		soumugua = (Button) findViewById(R.id.soumugua1);
+		souqita = (Button) findViewById(R.id.souqita1);
+		// tianxiekeyword.setText("");
+		// soufanshiliu.setText("");
+		// soufenjiao.setText("");
+		// soumugua.setText("");
+		// souqita.setText("");
 
 		try {
 
 			JSONObject jso = new JSONObject(response);
 
-			String keyword = jso.getString("keyword");
+			// String keyword = jso.getString("keyword");
+			// tianxiekeyword.setText(keyword);
+			String hotrWords = jso.getString("keyWord");
 
-			tianxiekeyword.setText(keyword);
+			String pattern = "([-*/^()\\]\\[])";
+			final String rWords = hotrWords.replaceAll(pattern, "");
+
+			new Thread() {
+				public void run() {
+					// 这儿是耗时操作，完成之后更新UI；
+					runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							// 更新UI
+							String[] strArray = null;
+							strArray = convertStrToArray(rWords);
+							if (strArray.length >= 4) {
+								soufanshiliu.setText(strArray[0].replace("\"",
+										""));
+
+								soufenjiao.setText(strArray[1]
+										.replace("\"", ""));
+								soumugua.setText(strArray[2].replace("\"", ""));
+								souqita.setText(strArray[3].replace("\"", ""));
+							} else if (strArray.length == 3) {
+								soufanshiliu.setText(strArray[0].replace("\"",
+										""));
+
+								soufenjiao.setText(strArray[1]
+										.replace("\"", ""));
+								soumugua.setText(strArray[2].replace("\"", ""));
+								souqita.setText("无更多搜索热词");
+							} else if (strArray.length == 2) {
+								soufanshiliu.setText(strArray[0].replace("\"",
+										""));
+
+								soufenjiao.setText(strArray[1]
+										.replace("\"", ""));
+								soumugua.setText("无更多搜索热词");
+								souqita.setText("无更多搜索热词");
+							} else if (strArray.length == 1) {
+								soufanshiliu.setText(strArray[0].replace("\"",
+										""));
+
+								soufenjiao.setText("无更多搜索热词");
+								soumugua.setText("无更多搜索热词");
+								souqita.setText("无更多搜索热词");
+							} else if (strArray.length == 0) {
+								soufanshiliu.setText("无更多搜索热词");
+
+								soufenjiao.setText("无更多搜索热词");
+								soumugua.setText("无更多搜索热词");
+								souqita.setText("无更多搜索热词");
+							}
+						}
+
+					});
+				}
+			}.start();
 
 		} catch (Exception e) {
 			Log.e(TAG, e.getLocalizedMessage(), e);
@@ -366,15 +433,10 @@ public class SerachActivity extends Activity {
 
 	}
 
-	// 隐藏键盘
-	private void hideKeyboard() {
-
-		InputMethodManager inputManager = (InputMethodManager) SerachActivity.this
-				.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-		inputManager.hideSoftInputFromWindow(SerachActivity.this
-				.getCurrentFocus().getWindowToken(),
-				InputMethodManager.HIDE_NOT_ALWAYS);
+	public static String[] convertStrToArray(String str) {
+		String[] strArray = null;
+		strArray = str.split(","); // 拆分字符为"," ,然后把结果交给数组strArray
+		return strArray;
 	}
 
 	// 主要操作部分
@@ -427,7 +489,6 @@ public class SerachActivity extends Activity {
 		@Override
 		protected void onPreExecute() {
 
-			hideKeyboard();
 			showProgressDialog();
 
 		}
