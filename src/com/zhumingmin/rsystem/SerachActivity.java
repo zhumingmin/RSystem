@@ -88,6 +88,13 @@ public class SerachActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_minxingsousuo);
+		Intent intent = getIntent();
+		if (intent != null) {
+			String sampleURL = SERVICE_URL2 + "/1";
+			WebServiceTask wst = new WebServiceTask(WebServiceTask.GET_TASK,
+					SerachActivity.this, "正在加载，请稍候...");
+			wst.execute(new String[] { sampleURL });
+		}
 		newsousuo = (EditText) findViewById(R.id.newsousuo1);
 		ly_fanhui = (LinearLayout) findViewById(R.id.ly_fanhui_sousuo);
 		tv_tip = (TextView) findViewById(R.id.tv_tip1);
@@ -119,10 +126,7 @@ public class SerachActivity extends Activity {
 				finish();
 			}
 		});
-		String sampleURL = SERVICE_URL2 + "/1";
-		WebServiceTask wst = new WebServiceTask(WebServiceTask.GET_TASK,
-				SerachActivity.this, "正在加载，请稍候...");
-		wst.execute(new String[] { sampleURL });
+
 		// 从后台获取搜索热词
 
 		soufanshiliu.setOnClickListener(new OnClickListener() {
@@ -140,9 +144,12 @@ public class SerachActivity extends Activity {
 
 				// the passed String is the URL we will POST to
 				wst.execute(new String[] { SERVICE_URL });
+				String classname = "SerachActivity";
 				Intent intent = new Intent(SerachActivity.this,
 						SerachListActivity.class);
+				intent.putExtra("classname", classname);
 				startActivity(intent);
+				finish();
 
 			}
 
@@ -162,9 +169,12 @@ public class SerachActivity extends Activity {
 
 				// the passed String is the URL we will POST to
 				wst.execute(new String[] { SERVICE_URL });
+				String classname = "SerachActivity";
 				Intent intent = new Intent(SerachActivity.this,
 						SerachListActivity.class);
+				intent.putExtra("classname", classname);
 				startActivity(intent);
+				finish();
 
 			}
 
@@ -184,10 +194,12 @@ public class SerachActivity extends Activity {
 
 				// the passed String is the URL we will POST to
 				wst.execute(new String[] { SERVICE_URL });
+				String classname = "SerachActivity";
 				Intent intent = new Intent(SerachActivity.this,
 						SerachListActivity.class);
 				startActivity(intent);
-
+				intent.putExtra("classname", classname);
+				finish();
 			}
 
 		});
@@ -206,10 +218,12 @@ public class SerachActivity extends Activity {
 
 				// the passed String is the URL we will POST to
 				wst.execute(new String[] { SERVICE_URL });
+				String classname = "SerachActivity";
 				Intent intent = new Intent(SerachActivity.this,
 						SerachListActivity.class);
+				intent.putExtra("classname", classname);
 				startActivity(intent);
-
+				finish();
 			}
 
 		});
@@ -218,9 +232,12 @@ public class SerachActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				String classname = "SerachActivity";
 				Intent intent = new Intent(SerachActivity.this,
 						SerachListActivity.class);
+				intent.putExtra("classname", classname);
 				startActivity(intent);
+				finish();
 
 			}
 
@@ -270,6 +287,10 @@ public class SerachActivity extends Activity {
 
 							// the passed String is the URL we will POST to
 							wst.execute(new String[] { SERVICE_URL });
+							Intent intent = new Intent(SerachActivity.this,
+									SerachListActivity.class);
+							startActivity(intent);
+							finish();
 
 						}
 						return false;
@@ -525,12 +546,12 @@ public class SerachActivity extends Activity {
 		protected void onPostExecute(String response) {
 
 			handleResponse(response);
-			if (response != null) {
-				Toast.makeText(getApplicationContext(), "成功！", 0).show();
-
-			} else {
-				Toast.makeText(getApplicationContext(), "失败！", 0).show();
-			}
+			// if (response != null) {
+			// Toast.makeText(getApplicationContext(), "成功！", 0).show();
+			//
+			// } else {
+			// Toast.makeText(getApplicationContext(), "失败！", 0).show();
+			// }
 			pDlg.dismiss();
 
 		}

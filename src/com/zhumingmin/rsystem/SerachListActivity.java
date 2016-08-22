@@ -37,6 +37,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -46,6 +47,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /*
@@ -59,30 +61,40 @@ public class SerachListActivity extends Activity {
 	private LinearLayout ly_fanhui;
 	private static final String SERVICE_URL = "http://192.168.191.1:8080/RestWebServiceDemo/rest/news";
 	private ImageButton load;
+	private TextView tv_result;
 	private static final String TAG = "SerachListActivity";
+	static String classname;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_listview);
-		String sampleURL = SERVICE_URL + "/1";
-		WebServiceTask wst = new WebServiceTask(WebServiceTask.GET_TASK,
-				SerachListActivity.this, "正在加载，请稍候...");
-		wst.execute(new String[] { sampleURL });
-		initNews();
-
 		ly_fanhui = (LinearLayout) findViewById(R.id.ly_liebiao);
+		tv_result = (TextView) findViewById(R.id.tv_result);
+		Intent intent = getIntent();
+		if (intent != null) {
+			classname = intent.getStringExtra("classname");
+
+			String sampleURL = SERVICE_URL + "/1";
+
+			WebServiceTask wst = new WebServiceTask(WebServiceTask.GET_TASK,
+					SerachListActivity.this, "正在加载，请稍候...");
+			wst.execute(new String[] { sampleURL });
+
+		}
+
 		load = (ImageButton) findViewById(R.id.load);
 		load.setOnClickListener(new Button.OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				finish();
+				SerachListActivity.this.finish();
 				Intent intent = new Intent(SerachListActivity.this,
 						SerachListActivity.class);
 				startActivity(intent);
+
 			}
 
 		});
@@ -94,10 +106,12 @@ public class SerachListActivity extends Activity {
 				Intent intent = new Intent(SerachListActivity.this,
 						SerachActivity.class);
 				startActivity(intent);
+				finish();
 			}
 		});
 		NewsAdapter adapter = new NewsAdapter(SerachListActivity.this,
 				R.layout.news_list_item, newslist);
+		adapter.notifyDataSetChanged();
 		ListView listview = (ListView) findViewById(R.id.list);
 		listview.setAdapter(adapter);
 
@@ -108,13 +122,10 @@ public class SerachListActivity extends Activity {
 						SerachDetailActivity.class);
 				intent.putExtra("news_id", position);
 				view.getContext().startActivity(intent);
+
 			}
 		});
 
-	}
-
-	public void refresh() {
-		onResume();
 	}
 
 	public static String[] convertStrToArray(String str) {
@@ -160,33 +171,16 @@ public class SerachListActivity extends Activity {
 			strArray5 = convertStrToArray(yueduliang);
 			strArray6 = convertStrToArray(like);
 			strArray7 = convertStrToArray(unlike);
-			if (newslist.size() != 0) {
-				newslist.clear();
-				for (int i = 0; i < strArray.length; i++) {
-					News news = new News(strArray[i].replace("\"", ""),
-							strArray4[i].replace("\"", ""),
-							strArray5[i].replace("\"", ""),
-							strArray6[i].replace("\"", ""),
-							strArray7[i].replace("\"", ""), strArray2[i]
-									.replace("\"", "").replace("\\r\\n\\r\\n",
-											"\r\n\r\n"), strArray3[i].replace(
-									"\"", "").replace("\\r\\n", ""));
-					newslist.add(news);
-
-				}
-			} else {
-				for (int i = 0; i < strArray.length; i++) {
-					News news = new News(strArray[i].replace("\"", ""),
-							strArray4[i].replace("\"", ""),
-							strArray5[i].replace("\"", ""),
-							strArray6[i].replace("\"", ""),
-							strArray7[i].replace("\"", ""), strArray2[i]
-									.replace("\"", "").replace("\\r\\n\\r\\n",
-											"\r\n\r\n"), strArray3[i].replace(
-									"\"", "").replace("\\r\\n", ""));
-					newslist.add(news);
-
-				}
+			newslist.clear();
+			tv_result.setText("");
+			for (int i = 0; i < strArray.length; i++) {
+				News news = new News(strArray[i].replace("\"", ""),
+						strArray4[i].replace("\"", ""), strArray5[i].replace(
+								"\"", ""), strArray6[i].replace("\"", ""),
+						strArray7[i].replace("\"", ""), strArray2[i].replace(
+								"\"", "").replace("\\r\\n\\r\\n", "\r\n\r\n"),
+						strArray3[i].replace("\"", "").replace("\\r\\n", ""));
+				newslist.add(news);
 
 			}
 
@@ -282,12 +276,12 @@ public class SerachListActivity extends Activity {
 		protected void onPostExecute(String response) {
 
 			handleResponse(response);
-			if (response != null) {
-				Toast.makeText(getApplicationContext(), "查询成功！", 0).show();
-
-			} else {
-				Toast.makeText(getApplicationContext(), "查询失败！", 0).show();
-			}
+			// if (response != null) {
+			// Toast.makeText(getApplicationContext(), "查询成功！", 0).show();
+			//
+			// } else {
+			// Toast.makeText(getApplicationContext(), "查询失败！", 0).show();
+			// }
 			pDlg.dismiss();
 			// System.out.println("输出"+response);
 
@@ -359,7 +353,15 @@ public class SerachListActivity extends Activity {
 
 	}
 
-	private void initNews() {
-
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if ((keyCode == KeyEvent.KEYCODE_BACK) && (event.getRepeatCount() == 0)) {
+			Intent intent = new Intent();
+			intent.setClass(SerachListActivity.this, SerachActivity.class);
+			startActivity(intent);
+			SerachListActivity.this.finish();
+		}
+		return super.onKeyDown(keyCode, event);
 	}
+
 }

@@ -94,6 +94,11 @@ public class SerachDetailActivity extends Activity {
 
 				// the passed String is the URL we will POST to
 				wst.execute(new String[] { SERVICE_URL });
+				String classname = "SerachDetailActivity";
+				Intent intent = new Intent(SerachDetailActivity.this,
+						SerachListActivity.class);
+				intent.putExtra("classname", classname);
+				startActivity(intent);
 				finish();
 			}
 		});
@@ -160,6 +165,7 @@ public class SerachDetailActivity extends Activity {
 				int a = Integer.parseInt(tuijian.getText().toString());
 				a = a + 1;
 				tuijian.setText(String.valueOf(a));
+				koufen.setEnabled(false);// 设置这个属性
 				// 这里后续的操作是上传阅读量，推荐数，不推荐数至后台
 
 			}
@@ -174,6 +180,7 @@ public class SerachDetailActivity extends Activity {
 				int a = Integer.parseInt(butuijian.getText().toString());
 				a = a + 1;
 				butuijian.setText(String.valueOf(a));
+				jiafen.setEnabled(false);// 设置这个属性
 			}
 		});
 	}
@@ -282,12 +289,12 @@ public class SerachDetailActivity extends Activity {
 		@Override
 		protected void onPostExecute(String response) {
 
-			if (response != null) {
-				Toast.makeText(getApplicationContext(), "上传成功！", 0).show();
-
-			} else {
-				Toast.makeText(getApplicationContext(), "上传失败！", 0).show();
-			}
+			// if (response != null) {
+			// Toast.makeText(getApplicationContext(), "上传成功！", 0).show();
+			//
+			// } else {
+			// Toast.makeText(getApplicationContext(), "上传失败！", 0).show();
+			// }
 			pDlg.dismiss();
 
 		}
@@ -445,6 +452,11 @@ public class SerachDetailActivity extends Activity {
 
 			// the passed String is the URL we will POST to
 			wst.execute(new String[] { SERVICE_URL });
+			String classname = "SerachDetailActivity";
+			Intent intent = new Intent(SerachDetailActivity.this,
+					SerachListActivity.class);
+			intent.putExtra("classname", classname);
+			startActivity(intent);
 			finish();
 		}
 		return super.onKeyDown(keyCode, event);
